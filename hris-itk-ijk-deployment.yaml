@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hris-itk-ijk
+  namespace: multi-project
+  labels:
+    app: hris-itk-ijk
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hris-itk-ijk
+  template:
+    metadata:
+      labels:
+        app: hris-itk-ijk
+        tier: backend
+    spec:
+      containers:
+      - name: hris-itk-ijk
+        image: hris-itk-ijk:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_DATABASE
+          value: "hris_itk_ijk"
+        - name: REDIS_HOST
+          value: "redis-service"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hris-itk-ijk-service
+  namespace: multi-project
+  labels:
+    app: hris-itk-ijk
+spec:
+  selector:
+    app: hris-itk-ijk
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hris-itk-ijk-hpa
+  namespace: multi-project
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hris-itk-ijk
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

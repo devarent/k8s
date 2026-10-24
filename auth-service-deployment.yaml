@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: multi-project
+  labels:
+    app: auth-service
+    tier: infrastructure
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        tier: infrastructure
+    spec:
+      containers:
+      - name: auth-service
+        image: keycloak/keycloak:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: "admin"
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-secrets
+              key: admin-password
+        - name: DB_VENDOR
+          value: "postgres"
+        - name: DB_ADDR
+          value: "postgres-service"
+        - name: DB_DATABASE
+          value: "keycloak"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: auth-secrets
+              key: db-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-secrets
+              key: db-password
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: keycloak-data
+          mountPath: /opt/keycloak/data
+      volumes:
+      - name: keycloak-data
+        persistentVolumeClaim:
+          claimName: keycloak-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: multi-project
+  labels:
+    app: auth-service
+spec:
+  selector:
+    app: auth-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-pvc
+  namespace: multi-project
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auth-secrets
+  namespace: multi-project
+type: Opaque
+stringData:
+  admin-password: "change-this-password"
+  db-user: "keycloak"
+  db-password: "change-this-db-password"
