@@ -1,4 +1,38 @@
 
+<!-- identity-block -->
+<div align="center">
+
+# k8s
+
+<sub>Manifest Kubernetes untuk deployment layanan HRIS, Laravel, dan aplikasi workspace.</sub>
+
+</div>
+
+## At a glance
+
+| Field | Detail |
+| --- | --- |
+| Repository | k8s |
+| Primary language | Mixed / documentation |
+| Topics | containers, deployment, devops, k8s, kubernetes, yaml |
+| License | MIT |
+| Branch | master |
+| Maintainer | [@devarent](https://github.com/devarent) |
+
+## Overview
+
+k8s is a hands-on repository focused on: Manifest Kubernetes untuk deployment layanan HRIS, Laravel, dan aplikasi workspace.. Primary language: Mixed / documentation. Topics: containers, deployment, devops, k8s, kubernetes, yaml. The README below documents the project; use the table above for a quick overview.
+
+### Global references
+
+<div align="center">
+
+🇮🇸 Iceland &middot; 🇳🇿 New Zealand &middot; 🇨🇭 Switzerland &middot; 🇸🇮 Slovenia &middot; 🇮🇪 Ireland &middot; 🇦🇹 Austria &middot; 🇵🇹 Portugal &middot; 🇸🇬 Singapore &middot; 🇫🇮 Finland
+
+</div>
+
+---
+
 <!-- dbx-style-kit -->
 <div align="center">
 
